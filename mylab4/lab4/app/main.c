@@ -27,7 +27,7 @@ void philosopher(int i){   // 哲学家编号：0-4
 
 
 sem_t mutex,empty,full;
-void producer(int i){
+/*void producer(int i){
 	int t=5;
 	while(t--){
 		sem_wait(&empty);
@@ -90,8 +90,7 @@ void wirter(){
 		sleep(128);
 	}
 }
-
-
+*/
 int uEntry(void) {
 
 	// 测试scanf	
