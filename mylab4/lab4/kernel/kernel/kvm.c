@@ -10,7 +10,7 @@ int current; // current process
 Semaphore sem[MAX_SEM_NUM];
 Device dev[MAX_DEV_NUM];
 
-int sys_cnt=0;
+
 /*
 MACRO
 SEG(type, base, lim, dpl) (SegDesc) {...};

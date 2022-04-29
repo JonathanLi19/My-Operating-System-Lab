@@ -8,7 +8,7 @@
 #define SYS_SLEEP 4
 #define SYS_EXIT 5
 #define SYS_SEM 6
-
+#define GETPID 7
 #define STD_OUT 0
 #define STD_IN 1
 
@@ -45,7 +45,7 @@ void syscallExec(struct StackFrame *sf);
 void syscallSleep(struct StackFrame *sf);
 void syscallExit(struct StackFrame *sf);
 void syscallSem(struct StackFrame *sf);
-void syscallCnt(struct StackFrame *sf);
+
 
 
 void syscallWriteStdOut(struct StackFrame *sf);
@@ -231,6 +231,9 @@ void syscallHandle(struct StackFrame *sf) {
 		case SYS_SEM:
 			syscallSem(sf);
 			break; // for SYS_SEM
+		case GETPID:
+			sf->eax = pcb[current].pid;
+			break;
 		default:break;
 	}
 }
@@ -343,7 +346,6 @@ void syscallReadStdIn(struct StackFrame *sf) {
 		asm volatile("movb $0x00, %%es:(%0)"::"r"(str+i));
 	}
 }
-
 void syscallFork(struct StackFrame *sf) {
 	int i, j;
 	for (i = 0; i < MAX_PCB_NUM; i++) {
@@ -457,20 +459,19 @@ void syscallSemInit(struct StackFrame *sf) {
 		pcb[current].regs.eax = i;
 	}
 	else
-		sf->eax = -1;
+		pcb[current].regs.eax = -1;
 }
 
 void syscallSemWait(struct StackFrame *sf) {
 	// TODO: complete `SemWait` and note that you need to consider some special situations
 	int i = (int)sf->edx;
-	//ProcessTable *pt = NULL;
 	if (i < 0 || i >= MAX_SEM_NUM) {
 		pcb[current].regs.eax = -1;
 		return;
 	}
 	if (sem[i].state == 1)
 	{
-		sf->eax = 0;
+		pcb[current].regs.eax = 0;
 		sem[i].value--;
 		if (sem[i].value < 0)
 		{
@@ -483,7 +484,7 @@ void syscallSemWait(struct StackFrame *sf) {
 		}
 	}
 	else
-		sf->eax = -1;
+		pcb[current].regs.eax = -1;
 }
 
 void syscallSemPost(struct StackFrame *sf) {
@@ -496,7 +497,7 @@ void syscallSemPost(struct StackFrame *sf) {
 	// TODO: complete other situations
 	if (sem[i].state == 1)
 	{
-		sf->eax = 0;
+		pcb[current].regs.eax = 0;
 		sem[i].value++;
 		if (sem[i].value <= 0)
 		{
@@ -504,11 +505,10 @@ void syscallSemPost(struct StackFrame *sf) {
 			sem[i].pcb.prev = (sem[i].pcb.prev)->prev;
 			(sem[i].pcb.prev)->next = &(sem[i].pcb);
 			pt->state = STATE_RUNNABLE;
-			pt->sleepTime = 0;
 		}
 	}
 	else
-		sf->eax = -1;
+		pcb[current].regs.eax = -1;
 }
 
 void syscallSemDestroy(struct StackFrame *sf) {
@@ -516,10 +516,9 @@ void syscallSemDestroy(struct StackFrame *sf) {
 	int i = sf->edx;
 	if (sem[i].state == 1)
 	{
-		sf->eax = 0;
+		pcb[current].regs.eax = 0;
 		sem[i].state = 0;
 	}
 	else
-		sf->eax = -1;
+		pcb[current].regs.eax = -1;
 }
-

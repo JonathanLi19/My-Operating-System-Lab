@@ -1,96 +1,123 @@
 #include "lib.h"
 #include "types.h"
 #define N 5
-
 sem_t fk[5];
 int times[5];
-
-void philosopher(int i){   // 哲学家编号：0-4
-  while(times[i]--){
-    printf("%d is thinking\n",i);            // 哲学家在思考
+void philosopher(int i)
+{   // 哲学家编号：0-4
+  while(times[i]--)
+  {
+    printf("Philosopher %d is thinking\n",i);            // 哲学家在思考
+	sleep(128);
     if(i%2==0){
 	sem_wait(&fk[i]);            // 去拿左边的叉子
+	sleep(128);
     sem_wait(&fk[(i+1)%N]);      // 去拿右边的叉子
+	sleep(128);
 	}
 	else{
 		sem_wait(&fk[(i+1)%N]);
+		sleep(128);
 		sem_wait(&fk[i]);            // 去拿左边的叉子
+		sleep(128);
 	}
-	printf("%d is eating\n",i);                 // 吃面条
+	printf("Philosopher %d is eating\n",i);                 // 吃面条
     sleep(128);
 	sem_post(&fk[i]);            // 放下左边的叉子
+	sleep(128);
     sem_post(&fk[(i+1)%N]);      // 放下右边的叉子
-	printf("%d end!\n",i);
+	sleep(128);
+	printf("Philosopher%d end!\n",i);
   }
   return;
 }
-
-
-sem_t mutex,empty,full;
-/*void producer(int i){
+void producer(int i,sem_t *mutex, sem_t *full, sem_t *empty)
+{
 	int t=5;
 	while(t--){
-		sem_wait(&empty);
-		sem_wait(&mutex);
-		cnt_plus();
-		printf("Producer %d put item into buffer,buffer size is %d\n",i,cnt_read());
-		sleep(10);
-		sem_post(&mutex);
-		sem_post(&full);
-	}
-	exit();
-}
-void consumer(int i){
-	int t=5;
-	while(t--){
-		sem_wait(&full);
-		sem_wait(&mutex);
-		cnt_sub();
-		printf("Consumer %d take item from buffer,buffer size is %d\n",i,cnt_read());
+		printf("Producer %d t: %d\n",i, t);
+		sem_wait(empty);
 		sleep(128);
-		sem_post(&mutex);
-		sem_post(&empty);
+		sem_wait(mutex);
+		sleep(128);
+		printf("Producer %d: produce\n", i);
+		sleep(128);
+		sem_post(mutex);
+		sleep(128);
+		sem_post(full);
+		sleep(128);
 	}
 	exit();
 }
-
-
-int r_cnt=0;
-sem_t w_mutex=1;
-sem_t r_mutex=1;
-void reader(int i){
+void consumer(int i,sem_t *mutex, sem_t *full, sem_t *empty)
+{
+	int t=5;
+	while(t--){
+		printf("Consumer %d t: %d\n",i, t);
+		sem_wait(full);
+		sleep(128);
+		sem_wait(mutex);
+		sleep(128);
+		printf("Consumer %d: consume\n", i);
+		sleep(128);
+		sem_post(mutex);
+		sleep(128);
+		sem_post(empty);
+		sleep(128);
+	}
+	exit();
+}
+int r_cnt = 0;
+void reader(int i,int* rcnt,sem_t *w_mutex, sem_t *r_mutex){
 	int t=5;
 	while(t--){
 		//printf("a\n");
-		sem_wait(&r_mutex);
-		//printf("%d",cnt_read());
-		if(cnt_read()==0)sem_wait(&w_mutex);	
-		//printf("c\n");
-		cnt_plus();
-		sem_post(&r_mutex);
-
-		printf("reader %d is reading,cnt= %d\n",i,cnt_read());
+		printf("Reader %d readcount = %d t=%d\n",i, *rcnt,t);
+		sem_wait(r_mutex);
 		sleep(128);
-
-		sem_wait(&r_mutex);
-		cnt_sub();
-		if(cnt_read()==0)sem_post(&w_mutex);
-		sem_post(&r_mutex);
+		if(*rcnt==0)
+		{
+			printf("Reader %d A rcnt = %d\n",i, *rcnt);
+			sem_wait(w_mutex);	
+			printf("Reader %d B\n",i);
+			sleep(128);
+			printf("Reader %d C\n",i);
+		}
+		++(*rcnt);
+		sem_post(r_mutex);
+		sleep(128);
+		printf("reader %d is quiting,cnt= %d rmutex = %d\n",i,*rcnt,*r_mutex);
+		sleep(128);
+		printf("reader %d is quiting,cnt= %d rmutex = %d\n",i,*rcnt,*r_mutex);
+		sem_wait(r_mutex);
+		printf("reader %d is quiting,cnt= %d rmutex = %d\n",i,*rcnt,*r_mutex);
+		sleep(128);
+		printf("reader %d is quiting,cnt= %d rmutex = %d\n",i,*rcnt,*r_mutex);
+		(*rcnt) = (*rcnt) - 1;
+		printf("reader %d is quiting,cnt= %d\n",i,*rcnt);
+		sleep(128);
+		if(*rcnt==0)
+		{
+			sem_post(w_mutex);
+			sleep(128);
+		}
+		sem_post(r_mutex);
 		sleep(128);
 	}
 }
 
-void wirter(){
+void writer(int i ,int* rcnt, sem_t *w_mutex)
+{
 	int t=5;
 	while(t--){
-		sem_wait(&w_mutex);
-		printf("Writer is Writing! cnt= %d\n",cnt_read());
+		sem_wait(w_mutex);
 		sleep(128);
-		sem_post(&w_mutex);
+		printf("Writer %d is Writing! cnt= %d\n",i, *rcnt);
+		sleep(128);
+		sem_post(w_mutex);
 		sleep(128);
 	}
 }
-*/
 int uEntry(void) {
 
 	// 测试scanf	
@@ -108,7 +135,7 @@ int uEntry(void) {
 	}
 	
 	// 测试信号量
-	int i = 4;
+	/*int i = 4;
 	sem_t sem;
 	printf("Father Process: Semaphore Initializing.\n");
 	ret = sem_init(&sem, 0);
@@ -139,8 +166,9 @@ int uEntry(void) {
 		}
 		printf("Father Process: Semaphore Destroying.\n");
 		sem_destroy(&sem);
-		exit();
-	}
+		//exit();
+		sleep(1);
+	}*/
 
 	// For lab4.3
 	// TODO: You need to design and test the philosopher problem.
@@ -148,12 +176,86 @@ int uEntry(void) {
 	// Requirements are demonstrated in the guide.
 	
 	//哲学家
-
+	/*printf("philosopher\n");
+	ret = 1;
+	for(int i=0;i<5;i++)
+	{
+		times[i] = 1;
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		sem_init(fk + i, 1);
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		if(ret > 0)
+ 			ret = fork();
+		else
+		{
+			printf("ret=%d, pid= %d, Fork error\n",ret, getpid());
+			break;
+		}		
+	}
+	if (getpid() > 1)
+	{
+		philosopher(getpid() - 2);
+		sem_destroy(fk +getpid() - 2);
+		exit();
+	}*/
 	//生产者消费者问题
-
+	printf("producer-consumer!\n");
+	sem_t mutex, full, empty;
+	sem_init(&mutex, 1);
+	sem_init(&empty, 5);
+	sem_init(&full, 0);
+	ret=1;
+	for (int i = 0; i < 5; i++)
+	{
+		if(ret > 0)
+ 			ret = fork();
+		else
+		{
+			printf("ret=%d, pid= %d, Fork error\n",ret, getpid());
+			break;
+		}		
+	}
+	int id = getpid();
+	if (id > 1 && id < 6)
+	{
+		producer(id,&mutex,&full, &empty);
+		//producer(id);
+	}
+	else if (id ==  6)
+	{
+		consumer(id,&mutex,&full, &empty);
+		//consumer(id);
+	}
 	//读者写者问题
-	
-
+	/*printf("read-write\n");
+	sem_t w_mutex, r_mutex;
+	sem_init(&w_mutex, 1);
+	sem_init(&r_mutex, 1);
+	ret = 1;
+	for (int i = 0; i < 6; i++)
+	{
+		if(ret > 0)
+ 			ret = fork();
+		else
+		{
+			printf("ret=%d, pid= %d, Fork error\n",ret, getpid());
+			break;
+		}		
+	}
+	int id = getpid();
+	if (id > 1 && id < 5)
+	{
+		reader(id,&r_cnt, &w_mutex,&r_mutex);
+	}
+	else if (id > 4 && id < 8)
+	{
+		//printf("%d",&w_mutex);
+		writer(id, &r_cnt, &w_mutex);
+	}*/
 	exit(0);
 	return 0;
 }

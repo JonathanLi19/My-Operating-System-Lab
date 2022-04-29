@@ -15,7 +15,7 @@
 #define STS_TG32    0xF         // 32-bit Trap Gate
 
 // GDT entries
-#define NR_SEGMENTS      15           // GDT size
+#define NR_SEGMENTS      16           // GDT size
 #define SEG_KCODE   1           // Kernel code
 #define SEG_KDATA   2           // Kernel data/stack
 #define SEG_TSS     (NR_SEGMENTS-1)
@@ -66,7 +66,7 @@ struct Device {
 typedef struct Device Device;
 
 #define MAX_STACK_SIZE 1024
-#define MAX_PCB_NUM ((NR_SEGMENTS-2)/2)
+#define MAX_PCB_NUM  ((NR_SEGMENTS-2)/2)
 
 #define STATE_RUNNABLE 0
 #define STATE_RUNNING 1
@@ -75,7 +75,7 @@ typedef struct Device Device;
 
 #define MAX_TIME_COUNT 16
 
-int sys_cnt;
+
 
 
 struct ProcessTable {
