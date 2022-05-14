@@ -11,6 +11,9 @@
 #define SYS_EXIT 5
 #define SYS_SEM 6
 #define GETPID 7
+#define GETREADCOUNT 8
+#define ADDREADCOUNT 9
+#define DECREASEREADCOUNT 10
 #define STD_OUT 0
 #define STD_IN 1
 
@@ -42,6 +45,7 @@ int sem_post(sem_t *sem);
 
 int sem_destroy(sem_t *sem);
 int getpid();
-
-
+int get_readcount();
+void add_readcount();
+void decrease_readcount();
 #endif

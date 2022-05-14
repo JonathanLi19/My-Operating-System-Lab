@@ -596,3 +596,17 @@ int getpid()
 {
 	return syscall(GETPID,0,0,0,0,0);
 }
+int get_readcount()
+{
+	return syscall(GETREADCOUNT,0,0,0,0,0);
+}
+void add_readcount()
+{
+	syscall(ADDREADCOUNT,0,0,0,0,0);
+	return;
+}
+void decrease_readcount()
+{
+	syscall(DECREASEREADCOUNT,0,0,0,0,0);
+	return; 
+}

@@ -9,7 +9,7 @@ int current; // current process
 
 Semaphore sem[MAX_SEM_NUM];
 Device dev[MAX_DEV_NUM];
-
+int readcount=0;
 
 /*
 MACRO

@@ -9,6 +9,9 @@
 #define SYS_EXIT 5
 #define SYS_SEM 6
 #define GETPID 7
+#define GETREADCOUNT 8
+#define ADDREADCOUNT 9
+#define DECREASEREADCOUNT 10
 #define STD_OUT 0
 #define STD_IN 1
 
@@ -32,7 +35,7 @@ extern int displayCol;
 extern uint32_t keyBuffer[MAX_KEYBUFFER_SIZE];
 extern int bufferHead;
 extern int bufferTail;
-
+extern int readcount;
 void GProtectFaultHandle(struct StackFrame *sf);
 void timerHandle(struct StackFrame *sf);
 void keyboardHandle(struct StackFrame *sf);
@@ -233,6 +236,15 @@ void syscallHandle(struct StackFrame *sf) {
 			break; // for SYS_SEM
 		case GETPID:
 			sf->eax = pcb[current].pid;
+			break;
+		case GETREADCOUNT:
+			sf->eax = readcount;
+			break;
+		case ADDREADCOUNT:
+			readcount++;
+			break;
+		case DECREASEREADCOUNT:
+			readcount--;
 			break;
 		default:break;
 	}
