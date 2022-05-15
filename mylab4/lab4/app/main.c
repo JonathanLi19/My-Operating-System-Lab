@@ -129,7 +129,7 @@ int uEntry(void) {
 	}
 	
 	// 测试信号量
-	/*int i = 4;
+	int i = 4;
 	sem_t sem;
 	printf("Father Process: Semaphore Initializing.\n");
 	ret = sem_init(&sem, 0);
@@ -162,7 +162,7 @@ int uEntry(void) {
 		sem_destroy(&sem);
 		//exit();
 		sleep(1);
-	}*/
+	}
 
 	// For lab4.3
 	// TODO: You need to design and test the philosopher problem.
@@ -170,7 +170,7 @@ int uEntry(void) {
 	// Requirements are demonstrated in the guide.
 	
 	//哲学家
-	/*printf("philosopher\n");
+	printf("philosopher\n");
 	ret = 1;
 	for(int i=0;i<5;i++)
 	{
@@ -195,7 +195,7 @@ int uEntry(void) {
 		philosopher(getpid() - 2);
 		sem_destroy(fk +getpid() - 2);
 		exit();
-	}*/
+	}
 	//生产者消费者问题
 	/*printf("producer-consumer!\n");
 	sem_t mutex, full, empty;
@@ -225,7 +225,7 @@ int uEntry(void) {
 		//consumer(id);
 	}*/
 	//读者写者问题
-	printf("read-write\n");
+	/*printf("read-write\n");
 	sem_t w_mutex, r_mutex;
 	sem_init(&w_mutex, 1);
 	sem_init(&r_mutex, 1);
@@ -249,7 +249,7 @@ int uEntry(void) {
 	{
 		//printf("%d",&w_mutex);
 		writer(id, &w_mutex);
-	}
+	}*/
 	exit(0);
 	return 0;
 }
