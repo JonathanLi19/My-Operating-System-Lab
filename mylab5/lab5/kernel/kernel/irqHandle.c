@@ -469,7 +469,7 @@ void syscallWriteFile(struct StackFrame *sf) {
 
 	if (quotient + j < inode.blockCount)
 		readBlock(&sBlock, &inode, quotient + j, buffer);
-	while(i < size) 
+	while(i < sz) 
 	{
 		buffer[(remainder + i) % sBlock.blockSize] = str[i];
 		i++;
@@ -498,7 +498,21 @@ void syscallWriteFile(struct StackFrame *sf) {
 	// TODO: WriteFile2
 	// 这里把inode修改后写回磁盘（inode的size需要修改）
 	// 使用 diskWrite 函数
+	if (quotient + j == inode.blockCount) {
+		ret = allocBlock(&sBlock, gDesc, &inode, file[file_idx].inodeOffset);
+		if (ret == -1) {
+			inode.size = inode.blockCount * sBlock.blockSize;
+			diskWrite(&inode, sizeof(Inode), 1, file[file_idx].inodeOffset);
+			pcb[current].regs.eax = inode.size - file[file_idx].offset;
+			file[file_idx].offset = inode.size;
+			return;
+		}
+	}
 
+	writeBlock(&sBlock, &inode, quotient + j, buffer);
+	if (size > inode.size - file[file_idx].offset)
+		inode.size = size + file[file_idx].offset;
+	diskWrite(&inode, sizeof(Inode), 1, file[file_idx].inodeOffset);
 
 
 	pcb[current].regs.eax = sz;
