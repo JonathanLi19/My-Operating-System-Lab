@@ -1,0 +1,6 @@
+challenge1
+challenge1_redirect
+challenge1_redirect.c
+challenge1.txt
+lab5
+xv6-riscv
