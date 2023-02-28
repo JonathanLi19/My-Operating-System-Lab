@@ -1,0 +1,16 @@
+
+Elf 文件类型为 EXEC (可执行文件)
+Entry point 0x1000a8
+There are 3 program headers, starting at offset 52
+
+程序头：
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  LOAD           0x001000 0x00100000 0x00100000 0x014bc 0x014bc R E 0x1000
+  LOAD           0x003000 0x00103000 0x00103000 0x00120 0x01f00 RW  0x1000
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
+
+ Section to Segment mapping:
+  段节...
+   00     .text .rodata .eh_frame 
+   01     .got.plt .data .bss 
+   02     
